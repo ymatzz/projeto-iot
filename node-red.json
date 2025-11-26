@@ -1,0 +1,220 @@
+[
+    {
+        "id": "5bf451ef861061bb",
+        "type": "tab",
+        "label": "Fluxo 4",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2ec48a3765d9afe5",
+        "type": "mqtt in",
+        "z": "5bf451ef861061bb",
+        "name": "",
+        "topic": "umidificador/automatico/dados/umidade",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "c902bac655412eb4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 280,
+        "wires": [
+            [
+                "848b23571e427ecc",
+                "2729893dd6cfd678",
+                "549d625aa98e96ca"
+            ]
+        ]
+    },
+    {
+        "id": "f383abf7cf24106c",
+        "type": "node-red-contrib-whatsapp-cmb-send-message",
+        "z": "5bf451ef861061bb",
+        "name": "",
+        "credtype": "account",
+        "account": "f8e6a687bb025f1a",
+        "text": "payload",
+        "phonenumbervalue": "",
+        "apikeyvalue": "",
+        "apikeyinputtypemessage": "msg",
+        "phonenumberinputtypemessage": "msg",
+        "inputtypemessage": "msg",
+        "rejectssl": false,
+        "x": 760,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "848b23571e427ecc",
+        "type": "function",
+        "z": "5bf451ef861061bb",
+        "name": "controla-liga-desliga",
+        "func": "var umidade = msg.payload;\n\nif (umidade < 40) {\n    msg.payload = \"true\"; \n} else if (umidade > 60) {\n    msg.payload = \"false\"; \n} \n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 440,
+        "wires": [
+            [
+                "aa7879d907748f62"
+            ]
+        ]
+    },
+    {
+        "id": "aa7879d907748f62",
+        "type": "mqtt out",
+        "z": "5bf451ef861061bb",
+        "name": "",
+        "topic": "umidificador/automatico/dados/estaLigado",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "d9f422b171329170",
+        "x": 780,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "2729893dd6cfd678",
+        "type": "function",
+        "z": "5bf451ef861061bb",
+        "name": "chama wpp",
+        "func": "var umidade = msg.payload;\n\nif (umidade < 40) {\n    \n    msg.payload = \"⚠️ Alerta! A umidade está crítica: \" + umidade + \"%\" + \" | Ativando umidificador!\";\n    \n    return msg; \n\n} else if (umidade > 60) {\n    msg.payload = \"⚠️ Alerta! A umidade está crítica: \" + umidade + \"%\" + \" | Cuidado ao permanecer no local!\";\n    \n    return msg; \n\n} else {\n    return null;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 260,
+        "wires": [
+            [
+                "f383abf7cf24106c"
+            ]
+        ]
+    },
+    {
+        "id": "549d625aa98e96ca",
+        "type": "influxdb out",
+        "z": "5bf451ef861061bb",
+        "influxdb": "a7defcbcb0dde58d",
+        "name": "mydb",
+        "measurement": "umidade",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "b4792b0b1468429f",
+        "bucket": "bucket_dados",
+        "x": 470,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "c902bac655412eb4",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "mqtt-publisher-temperatura-consumer",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "f8e6a687bb025f1a",
+        "type": "node-red-contrib-whatsapp-cmb-account",
+        "name": "conta do zap"
+    },
+    {
+        "id": "d9f422b171329170",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "broker.hivemq.com",
+        "port": 1883,
+        "clientid": "consumer-2",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a7defcbcb0dde58d",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "https://us-east-1-1.aws.cloud2.influxdata.com",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "101bdeb202068b22",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-whatsapp-cmb": "1.0.3",
+            "node-red-contrib-influxdb": "0.7.0"
+        }
+    }
+]
